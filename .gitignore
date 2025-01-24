@@ -175,3 +175,4 @@ dist
 .pylon
 
 .direnv
+prisma/dev.db
