@@ -6,7 +6,7 @@ import { prisma } from "~/lib/prisma";
 
 export class MessagesService {
   @protectedRoute
-  static async findAll(page = 1, perPage = 10) {
+  static async findAllMyMessages(page = 1, perPage = 10) {
     const where: Prisma.MessageWhereInput = {
       creator: { id: getUserId() },
     };
@@ -16,6 +16,9 @@ export class MessagesService {
         skip: (page - 1) * perPage,
         take: perPage,
         where,
+        orderBy: {
+          createdAt: "desc",
+        },
       }),
       prisma.message.count({ where }),
     ]);
@@ -24,13 +27,59 @@ export class MessagesService {
     return { meta, data: result };
   }
 
+  static async findAllGlobal(page = 1, perPage = 10) {
+    const [result, count] = await prisma.$transaction([
+      prisma.message.findMany({
+        skip: (page - 1) * perPage,
+        take: perPage,
+        orderBy: {
+          createdAt: "desc",
+        },
+        include: {
+          creator: {
+            select: {
+              id: true,
+              name: true,
+              username: true,
+            },
+          },
+        },
+        omit: {
+          userId: true,
+        },
+      }),
+      prisma.message.count(),
+    ]);
+    const meta = getPaginationMeta(page, perPage, count);
+
+    return { meta, data: result };
+  }
+
   @protectedRoute
-  static async findOne(id: number) {
+  static async findOneMyMessage(id: number) {
     const where: Prisma.MessageWhereUniqueInput = {
       id,
       creator: { id: getUserId() },
     };
     return await prisma.message.findUnique({ where });
+  }
+
+  static async findOneGlobal(id: number) {
+    return await prisma.message.findUnique({
+      where: { id },
+      include: {
+        creator: {
+          select: {
+            id: true,
+            name: true,
+            username: true,
+          },
+        },
+      },
+      omit: {
+        userId: true,
+      },
+    });
   }
 
   @protectedRoute
