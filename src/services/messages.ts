@@ -4,84 +4,105 @@ import { getUserId } from "~/lib/auth";
 import { getPaginationMeta } from "~/lib/pagination";
 import { prisma } from "~/lib/prisma";
 
-const commonMessageSelect = {
-  id: true,
-  name: true,
-  username: true,
-};
-
 export class MessagesService {
-  private static async findMessages(
-    page: number,
-    perPage: number,
-    where?: Prisma.MessageWhereInput,
-    includeCreator = false
-  ) {
+  @protectedRoute
+  static async findAllMyMessages(page = 1, perPage = 10) {
+    const where: Prisma.MessageWhereInput = {
+      creator: { id: getUserId() },
+    };
+
     const [result, count] = await prisma.$transaction([
       prisma.message.findMany({
         skip: (page - 1) * perPage,
         take: perPage,
         where,
-        orderBy: { createdAt: "desc" },
-        include: includeCreator
-          ? { creator: { select: commonMessageSelect } }
-          : undefined,
-        omit: includeCreator ? { userId: true } : undefined,
+        orderBy: {
+          createdAt: "desc",
+        },
       }),
       prisma.message.count({ where }),
     ]);
-    return { meta: getPaginationMeta(page, perPage, count), data: result };
+    const meta = getPaginationMeta(page, perPage, count);
+
+    return { meta, data: result };
+  }
+
+  static async findAllGlobal(page = 1, perPage = 10) {
+    const [result, count] = await prisma.$transaction([
+      prisma.message.findMany({
+        skip: (page - 1) * perPage,
+        take: perPage,
+        orderBy: {
+          createdAt: "desc",
+        },
+        include: {
+          creator: {
+            select: {
+              id: true,
+              name: true,
+              username: true,
+            },
+          },
+        },
+        omit: {
+          userId: true,
+        },
+      }),
+      prisma.message.count(),
+    ]);
+    const meta = getPaginationMeta(page, perPage, count);
+
+    return { meta, data: result };
   }
 
   @protectedRoute
-  static findAllMyMessages(page = 1, perPage = 10) {
-    return this.findMessages(page, perPage, { creator: { id: getUserId() } });
+  static async findOneMyMessage(id: number) {
+    const where: Prisma.MessageWhereUniqueInput = {
+      id,
+      creator: { id: getUserId() },
+    };
+    return await prisma.message.findUnique({ where });
   }
 
-  static findAllGlobal(page = 1, perPage = 10) {
-    return this.findMessages(page, perPage, undefined, true);
-  }
-
-  private static findMessage(
-    where: Prisma.MessageWhereUniqueInput,
-    includeCreator = false
-  ) {
-    return prisma.message.findUnique({
-      where,
-      include: includeCreator
-        ? { creator: { select: commonMessageSelect } }
-        : undefined,
-      omit: includeCreator ? { userId: true } : undefined,
+  static async findOneGlobal(id: number) {
+    return await prisma.message.findUnique({
+      where: { id },
+      include: {
+        creator: {
+          select: {
+            id: true,
+            name: true,
+            username: true,
+          },
+        },
+      },
+      omit: {
+        userId: true,
+      },
     });
   }
 
   @protectedRoute
-  static findOneMyMessage(id: number) {
-    return this.findMessage({ id, creator: { id: getUserId() } });
-  }
-
-  static findOneGlobal(id: number) {
-    return this.findMessage({ id }, true);
-  }
-
-  @protectedRoute
-  static create(data: Prisma.MessageCreateWithoutCreatorInput) {
-    return prisma.message.create({
-      data: { ...data, creator: { connect: { id: getUserId() } } },
+  static async create(data: Prisma.MessageCreateWithoutCreatorInput) {
+    return await prisma.message.create({
+      data: {
+        ...data,
+        creator: { connect: { id: getUserId() } },
+      },
     });
   }
 
   @protectedRoute
-  static update(id: number, data: Prisma.MessageUpdateInput) {
-    return prisma.message.update({
+  static async update(id: number, data: Prisma.MessageUpdateInput) {
+    return await prisma.message.update({
       where: { id },
       data: { ...data, creator: { connect: { id: getUserId() } } },
     });
   }
 
   @protectedRoute
-  static delete(ids: number[]) {
-    return prisma.message.deleteMany({
+  static async delete(ids: number[]) {
+    return await prisma.message.deleteMany({
       where: { id: { in: ids }, creator: { id: getUserId() } },
     });
   }
