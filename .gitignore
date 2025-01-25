@@ -178,3 +178,4 @@ dist
 prisma/dev.db
 tests
 server
+prisma/dev.db-journal

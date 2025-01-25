@@ -5,6 +5,7 @@
 	"type": "module",
 	"description": "Generated with `npm create pylon`",
 	"scripts": {
+		"start": "prisma migrate deploy && bun -b run .pylon/index.js",
 		"dev": "pylon dev -c \"bun run .pylon/index.js\" --client --client-port 3000 --client-path gqty/index.ts",
 		"build": "pylon build"
 	},
