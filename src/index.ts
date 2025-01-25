@@ -14,12 +14,12 @@ app.use(
   "*",
   sessionMiddleware({
     store,
-    encryptionKey: process.env.APP_SECRET, // Required for CookieStore, recommended for others
+    encryptionKey: appSecret,
     expireAfterSeconds: 60 * 60 * 24 * 30,
     cookieOptions: {
-      sameSite: "Lax", // Recommended for basic CSRF protection in modern browsers
-      path: "/", // Required for this library to work properly
-      httpOnly: true, // Recommended to avoid XSS attacks
+      sameSite: "Lax",
+      path: "/",
+      httpOnly: true,
     },
   })
 );
