@@ -1,7 +1,17 @@
-import '@getcronit/pylon'
+import "@getcronit/pylon";
+import { Session } from "hono-sessions";
 
-declare module '@getcronit/pylon' {
+type SessionDataTypes = {
+  id: number;
+};
+
+declare module "@getcronit/pylon" {
   interface Bindings {}
 
-  interface Variables {}
+  interface Variables {
+    userId?: number; 
+
+    session: Session<SessionDataTypes>;
+    session_key_rotation: boolean;
+  }
 }

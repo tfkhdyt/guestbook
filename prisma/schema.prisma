@@ -3,6 +3,7 @@
 
 generator client {
   provider = "prisma-client-js"
+  previewFeatures = ["omitApi"]
 }
 
 datasource db {
@@ -10,8 +11,20 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model User {
+  id        Int       @id @default(autoincrement())
+  name      String?
+  username  String    @unique
+  password  String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  Message   Message[]
+}
+
 model Message {
   id         Int      @id @default(autoincrement())
+  userId     Int
+  creator    User     @relation(fields: [userId], references: [id])
   senderName String
   content    String
   createdAt  DateTime @default(now())
