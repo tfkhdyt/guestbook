@@ -1,8 +1,8 @@
 import { getContext, ServiceError } from "@getcronit/pylon";
-import { prisma } from "../lib/prisma";
 import { Prisma } from "@prisma/client";
-import { protectedRoute } from "../decorators/auth";
-import { getUserId } from "../lib/auth";
+import { protectedRoute } from "~/decorators/auth";
+import { getUserId } from "~/lib/auth";
+import { prisma } from "~/lib/prisma";
 
 export class AuthService {
   @protectedRoute

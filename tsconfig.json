@@ -2,7 +2,10 @@
   "extends": "@getcronit/pylon/tsconfig.pylon.json",
   "compilerOptions": {
     // add Bun type definitions
-    "types": ["bun-types"]
+    "types": ["bun-types"],
+    "paths": {
+      "~/*": ["./src/*"]
+    }
   },
   "include": ["pylon.d.ts", "src/**/*.ts"]
 }

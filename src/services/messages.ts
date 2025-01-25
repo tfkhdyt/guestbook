@@ -1,9 +1,8 @@
 import { Prisma } from "@prisma/client";
-import { getPaginationMeta } from "../lib/pagination";
-import { prisma } from "../lib/prisma";
-import { protectedRoute } from "../decorators/auth";
-import { getContext } from "@getcronit/pylon";
-import { getUserId } from "../lib/auth";
+import { protectedRoute } from "~/decorators/auth";
+import { getUserId } from "~/lib/auth";
+import { getPaginationMeta } from "~/lib/pagination";
+import { prisma } from "~/lib/prisma";
 
 export class MessagesService {
   @protectedRoute
