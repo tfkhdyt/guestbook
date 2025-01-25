@@ -1,26 +1,27 @@
 {
-  "name": "belajar-pylon",
-  "private": true,
-  "version": "0.0.1",
-  "type": "module",
-  "description": "Generated with `npm create pylon`",
-  "scripts": {
-    "dev": "pylon dev -c \"bun run .pylon/index.js\"",
-    "build": "pylon build"
-  },
-  "dependencies": {
-    "@getcronit/pylon": "^2.0.0",
-    "@prisma/client": "6.0.1",
-    "bun-types": "^1.1.18",
-    "hono-sessions": "^0.7.1"
-  },
-  "devDependencies": {
-    "@getcronit/pylon-dev": "^1.0.0",
-    "prisma": "6.0.1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/getcronit/pylon.git"
-  },
-  "homepage": "https://pylon.cronit.io"
+	"name": "belajar-pylon",
+	"private": true,
+	"version": "0.0.1",
+	"type": "module",
+	"description": "Generated with `npm create pylon`",
+	"scripts": {
+		"dev": "pylon dev -c \"bun run .pylon/index.js\" --client --client-port 3000 --client-path gqty/index.ts",
+		"build": "pylon build"
+	},
+	"dependencies": {
+		"@getcronit/pylon": "^2.0.0",
+		"@prisma/client": "6.0.1",
+		"bun-types": "^1.1.18",
+		"hono-sessions": "^0.7.1",
+		"zod": "^3.24.1"
+	},
+	"devDependencies": {
+		"@getcronit/pylon-dev": "^1.0.0",
+		"prisma": "6.0.1"
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/getcronit/pylon.git"
+	},
+	"homepage": "https://pylon.cronit.io"
 }
