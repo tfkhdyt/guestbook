@@ -177,3 +177,4 @@ dist
 .direnv
 prisma/dev.db
 tests
+server
