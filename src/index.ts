@@ -2,6 +2,8 @@ import { app } from "@getcronit/pylon";
 import { CookieStore, sessionMiddleware } from "hono-sessions";
 import { AuthService } from "./services/auth";
 import { MessagesService } from "./services/messages";
+import { validateLogin, validateRegister } from "./validators/auth";
+import { validateCreateMessage } from "./validators/message";
 
 const appSecret = process.env.APP_SECRET;
 if (!appSecret) {
@@ -26,18 +28,27 @@ app.use(
 
 export const graphql = {
   Query: {
-    messages: { all: MessagesService.findAll, one: MessagesService.findOne },
+    messages: {
+      mine: {
+        findAll: MessagesService.findAllMyMessages,
+        findOne: MessagesService.findOneMyMessage,
+      },
+      global: {
+        findAll: MessagesService.findAllGlobal,
+        findOne: MessagesService.findOneGlobal,
+      }
+    },
     auth: { me: AuthService.me },
   },
   Mutation: {
     messages: {
-      create: MessagesService.create,
+      create: validateCreateMessage(MessagesService.create),
       update: MessagesService.update,
       delete: MessagesService.delete,
     },
     auth: {
-      register: AuthService.register,
-      login: AuthService.login,
+      register: validateRegister(AuthService.register),
+      login: validateLogin(AuthService.login),
       logout: AuthService.logout,
     },
   },
