@@ -6,7 +6,7 @@ import { prisma } from "~/lib/prisma";
 
 export class MessagesService {
   @protectedRoute
-  static async findAllMyMessages(page = 1, perPage = 10) {
+  static async listMyMessages(page = 1, perPage = 10) {
     const where: Prisma.MessageWhereInput = {
       creator: { id: getUserId() },
     };
@@ -27,7 +27,7 @@ export class MessagesService {
     return { meta, data: result };
   }
 
-  static async findAllGlobal(page = 1, perPage = 10) {
+  static async listPublicMessages(page = 1, perPage = 10) {
     const [result, count] = await prisma.$transaction([
       prisma.message.findMany({
         skip: (page - 1) * perPage,
@@ -56,7 +56,7 @@ export class MessagesService {
   }
 
   @protectedRoute
-  static async findOneMyMessage(id: number) {
+  static async getMyMessage(id: number) {
     const where: Prisma.MessageWhereUniqueInput = {
       id,
       creator: { id: getUserId() },
@@ -64,7 +64,7 @@ export class MessagesService {
     return await prisma.message.findUnique({ where });
   }
 
-  static async findOneGlobal(id: number) {
+  static async getPublicMessage(id: number) {
     return await prisma.message.findUnique({
       where: { id },
       include: {
@@ -83,20 +83,20 @@ export class MessagesService {
   }
 
   @protectedRoute
-  static async create(data: Prisma.MessageCreateWithoutCreatorInput) {
+  static async create(content: string) {
     return await prisma.message.create({
       data: {
-        ...data,
+        content,
         creator: { connect: { id: getUserId() } },
       },
     });
   }
 
   @protectedRoute
-  static async update(id: number, data: Prisma.MessageUpdateInput) {
+  static async update(id: number, content: string) {
     return await prisma.message.update({
       where: { id },
-      data: { ...data, creator: { connect: { id: getUserId() } } },
+      data: { content, creator: { connect: { id: getUserId() } } },
     });
   }
 

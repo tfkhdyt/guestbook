@@ -3,7 +3,7 @@ import { CookieStore, sessionMiddleware } from "hono-sessions";
 import { AuthService } from "./services/auth";
 import { MessagesService } from "./services/messages";
 import { validateLogin, validateRegister } from "./validators/auth";
-import { validateCreateMessage } from "./validators/message";
+import { validateCreateMessage, validateUpdateMessage } from "./validators/message";
 
 const appSecret = process.env.APP_SECRET;
 if (!appSecret) {
@@ -28,29 +28,28 @@ app.use(
 
 export const graphql = {
   Query: {
-    messages: {
-      mine: {
-        findAll: MessagesService.findAllMyMessages,
-        findOne: MessagesService.findOneMyMessage,
-      },
-      global: {
-        findAll: MessagesService.findAllGlobal,
-        findOne: MessagesService.findOneGlobal,
-      }
+    me: AuthService.me,
+    myMessages: {
+      list: MessagesService.listMyMessages,
+      get: MessagesService.getMyMessage,
     },
-    auth: { me: AuthService.me },
+    publicMessages: {
+      list: MessagesService.listPublicMessages,
+      get: MessagesService.getPublicMessage,
+    },
+    // Optional: Add health check
+    healthCheck: () => ({ status: "OK" }),
   },
   Mutation: {
-    messages: {
-      create: validateCreateMessage(MessagesService.create),
-      update: MessagesService.update,
-      delete: MessagesService.delete,
-    },
-    auth: {
-      register: validateRegister(AuthService.register),
-      login: validateLogin(AuthService.login),
-      logout: AuthService.logout,
-    },
+    // Authentication mutations
+    registerUser: validateRegister(AuthService.register),
+    loginUser: validateLogin(AuthService.login),
+    logoutUser: AuthService.logout,
+
+    // Message mutations
+    createMessage: validateCreateMessage(MessagesService.create),
+    updateMessage: validateUpdateMessage(MessagesService.update),
+    deleteMessage: MessagesService.delete,
   },
 };
 
